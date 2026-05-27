@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Professional F1 Dashboard
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+<body>
+
+<header class="top-bar">
+
+  <div>
+
+    <h1>
+      Mercedes AMG F1 Dashboard
+    </h1>
+
+    <div id="sessionName">
+      Loading Session...
+    </div>
+
+  </div>
+
+</header>
+
+<main class="dashboard-grid">
+
+  <!-- LEFT -->
+
+  <section class="timing-panel">
+
+    <div class="panel-title">
+      Timing Tower
+    </div>
+
+    <div id="timingTower">
+
+      Waiting For Data...
+
+    </div>
+
+  </section>
+
+  <!-- CENTER -->
+
+  <section class="center-panel">
+
+    <div class="track-container">
+
+      <div class="panel-title">
+        Live Track Map
+      </div>
+
+      <div id="trackWrapper">
+
+        <svg
+          id="trackMap"
+          viewBox="0 0 1000 600"
+        >
+
+          <path
+            id="trackLayout"
+            d=""
+          ></path>
+
+        </svg>
+
+      </div>
+
+    </div>
+
+    <div class="driver-focus-container">
+
+      <div class="panel-title">
+        Driver Focus
+      </div>
+
+      <div id="driverFocusPanel">
+
+        Select Driver
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- RIGHT -->
+
+  <section class="right-panel">
+
+    <div class="widget">
+
+      <div class="panel-title">
+        Weather
+      </div>
+
+      <div id="weatherWidget">
+
+        Waiting For Data...
+
+      </div>
+
+    </div>
+
+    <div class="widget">
+
+      <div class="panel-title">
+        Race Control
+      </div>
+
+      <div id="raceControlWidget">
+
+        Waiting For Data...
+
+      </div>
+
+    </div>
+
+    <div class="widget">
+
+      <div class="panel-title">
+        Team Radio
+      </div>
+
+      <div id="radioWidget">
+
+        Waiting For Data...
+
+      </div>
+
+    </div>
+
+    <div class="widget">
+
+      <div class="panel-title">
+        Fastest Lap
+      </div>
+
+      <div id="fastestLapWidget">
+
+        Waiting For Data...
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script src="app.js"></script>
+
+</body>
+</html>
