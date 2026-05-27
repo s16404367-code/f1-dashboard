@@ -1,22 +1,4 @@
-import {
-  getLatestSession,
-  getSessionsByYear,
-  getDrivers,
-  getPositions,
-  getWeather,
-  getRadio,
-  getRaceControl,
-  getLaps
-} from './modules/api.js';
-
-import {
-  renderTimingTower
-} from './modules/timing.js';
-
-import {
-  renderTrack,
-  renderDriverDots
-} from './modules/map.js';
+const OPENF1 = 'https://api.openf1.org/v1';
 
 const sessionName =
   document.getElementById('sessionName');
@@ -61,131 +43,263 @@ let positions = [];
 
 let selectedDriver = null;
 
+const TEAM_COLORS = {
+
+  "Red Bull": "#1E5BC6",
+  "Ferrari": "#DC0000",
+  "Mercedes": "#00D2BE",
+  "McLaren": "#FF8700",
+  "Aston Martin": "#006F62",
+  "Alpine": "#0090FF",
+  "Williams": "#005AFF",
+  "RB": "#6692FF",
+  "Kick Sauber": "#52E252",
+  "Haas": "#FFFFFF"
+};
+
+const TRACKS = {
+
+  "Bahrain":
+    "M180 300 L300 120 L700 120 L820 300 L700 480 L300 480 Z",
+
+  "Monaco":
+    "M220 300 C220 120 650 120 700 260 C720 420 320 500 220 300",
+
+  "Silverstone":
+    "M100 300 L240 120 L700 120 L850 300 L700 480 L240 480 Z",
+
+  "Spa":
+    "M120 340 C200 100 720 100 860 320 C720 520 240 520 120 340",
+
+  "Monza":
+    "M220 140 L760 140 L860 300 L760 460 L220 460 L120 300 Z",
+
+  "Singapore":
+    "M150 300 C250 80 700 80 820 300 C700 520 250 520 150 300"
+};
+
 async function initialize() {
 
-  await populateEvents(
-    seasonSelector.value
-  );
+  try {
 
-  currentSession =
-    await getLatestSession();
+    const sessionResponse =
+      await fetch(`${OPENF1}/sessions`);
 
-  if (currentSession) {
+    const sessions =
+      await sessionResponse.json();
 
-    await loadFullDashboard(
-      currentSession
-    );
+    if (!sessions.length) {
+
+      sessionName.innerHTML =
+        'No Session Found';
+
+      return;
+    }
+
+    currentSession =
+      sessions[sessions.length - 1];
+
+    sessionName.innerHTML =
+      currentSession.meeting_name +
+      ' - ' +
+      currentSession.session_name;
+
+    populateTrack();
+
+    await loadDrivers();
+
+    await loadWeather();
+
+    await loadRaceControl();
+
+    await loadRadio();
+
+    await loadFastestLap();
+
+  } catch (error) {
+
+    console.log(error);
+
+    sessionName.innerHTML =
+      'Dashboard Failed To Load';
   }
 }
 
-async function populateEvents(
-  year
-) {
+function populateTrack() {
 
-  const sessions =
-    await getSessionsByYear(year);
+  const name =
+    currentSession.meeting_name;
 
-  eventSelector.innerHTML = '';
+  for (const track in TRACKS) {
 
-  const meetings = {};
+    if (name.includes(track)) {
 
-  sessions.forEach(session => {
-
-    meetings[
-      session.meeting_name
-    ] = session;
-  });
-
-  Object.values(meetings)
-    .forEach(meeting => {
-
-      const option =
-        document.createElement('option');
-
-      option.value =
-        meeting.session_key;
-
-      option.textContent =
-        meeting.meeting_name;
-
-      eventSelector.appendChild(option);
-    });
-}
-
-async function loadFullDashboard(
-  session
-) {
-
-  currentSession = session;
-
-  sessionName.innerHTML =
-    session.meeting_name +
-    ' - ' +
-    session.session_name;
-
-  renderTrack(
-    trackLayout,
-    session.meeting_name
-  );
-
-  drivers =
-    await getDrivers(
-      session.session_key
-    );
-
-  positions =
-    await getPositions(
-      session.session_key
-    );
-
-  renderEverything();
-
-  await loadWidgets();
-
-  setInterval(async () => {
-
-    positions =
-      await getPositions(
-        currentSession.session_key
+      trackLayout.setAttribute(
+        'd',
+        TRACKS[track]
       );
 
-    renderEverything();
+      return;
+    }
+  }
 
-    await loadWidgets();
-
-  }, 10000);
-}
-
-function renderEverything() {
-
-  renderTimingTower(
-    timingTower,
-    drivers,
-    positions,
-    selectedDriver,
-    selectDriver
-  );
-
-  renderDriverDots(
-    trackMap,
-    drivers,
-    positions,
-    selectedDriver
+  trackLayout.setAttribute(
+    'd',
+    'M150 300 C250 100 700 100 820 300'
   );
 }
 
-function selectDriver(
+async function loadDrivers() {
+
+  try {
+
+    const driverResponse =
+      await fetch(
+        `${OPENF1}/drivers?session_key=${currentSession.session_key}`
+      );
+
+    drivers =
+      await driverResponse.json();
+
+    const positionResponse =
+      await fetch(
+        `${OPENF1}/position?session_key=${currentSession.session_key}`
+      );
+
+    positions =
+      await positionResponse.json();
+
+    renderTimingTower();
+
+    renderTrackDots();
+
+  } catch (error) {
+
+    console.log(error);
+
+    timingTower.innerHTML =
+      'Timing Data Failed';
+  }
+}
+
+function renderTimingTower() {
+
+  timingTower.innerHTML = '';
+
+  const latestPositions = {};
+
+  positions.forEach(position => {
+
+    latestPositions[
+      position.driver_number
+    ] = position;
+  });
+
+  const sorted =
+    Object.values(latestPositions)
+      .sort((a, b) =>
+        a.position - b.position
+      );
+
+  sorted.forEach((position, index) => {
+
+    const driver =
+      drivers.find(d =>
+        d.driver_number ===
+        position.driver_number
+      );
+
+    if (!driver) return;
+
+    const row =
+      document.createElement('div');
+
+    row.className =
+      'driver-row';
+
+    const teamColor =
+      TEAM_COLORS[
+        driver.team_name
+      ] || '#00D2BE';
+
+    row.style.borderLeft =
+      `4px solid ${teamColor}`;
+
+    row.innerHTML = `
+
+      <div class="driver-top">
+
+        <div>
+
+          <div class="driver-name">
+
+            P${position.position}
+            ${driver.name_acronym}
+
+          </div>
+
+          <div class="team-name">
+
+            ${driver.team_name}
+
+          </div>
+
+        </div>
+
+        <div>
+
+          #${driver.driver_number}
+
+        </div>
+
+      </div>
+
+      <div class="driver-extra">
+
+        <div>
+
+          ${
+            index === 0
+              ? 'LEADER'
+              : '+' + (index * 1.2).toFixed(1)
+          }
+
+        </div>
+
+        <div>
+
+          RUN
+
+        </div>
+
+      </div>
+    `;
+
+    row.onclick = () => {
+
+      selectedDriver = driver;
+
+      renderDriverFocus(
+        driver,
+        position
+      );
+    };
+
+    timingTower.appendChild(row);
+  });
+}
+
+function renderDriverFocus(
   driver,
   position
 ) {
-
-  selectedDriver = driver;
 
   driverFocusPanel.innerHTML = `
 
     <div class="driver-focus-grid">
 
       <div class="focus-card">
+
         <div class="focus-card-title">
           Driver
         </div>
@@ -193,9 +307,11 @@ function selectDriver(
         <div class="focus-card-value">
           ${driver.full_name}
         </div>
+
       </div>
 
       <div class="focus-card">
+
         <div class="focus-card-title">
           Team
         </div>
@@ -203,9 +319,11 @@ function selectDriver(
         <div class="focus-card-value">
           ${driver.team_name}
         </div>
+
       </div>
 
       <div class="focus-card">
+
         <div class="focus-card-title">
           Position
         </div>
@@ -213,113 +331,241 @@ function selectDriver(
         <div class="focus-card-value">
           P${position.position}
         </div>
+
       </div>
 
       <div class="focus-card">
+
         <div class="focus-card-title">
-          Number
+          Driver Number
         </div>
 
         <div class="focus-card-value">
           #${driver.driver_number}
         </div>
+
       </div>
 
     </div>
   `;
-
-  renderEverything();
 }
 
-async function loadWidgets() {
+function renderTrackDots() {
 
-  if (!currentSession) return;
+  document
+    .querySelectorAll('.driver-dot')
+    .forEach(dot => dot.remove());
 
-  const weather =
-    await getWeather(
-      currentSession.session_key
+  const latestPositions = {};
+
+  positions.forEach(position => {
+
+    latestPositions[
+      position.driver_number
+    ] = position;
+  });
+
+  const sorted =
+    Object.values(latestPositions)
+      .sort((a, b) =>
+        a.position - b.position
+      );
+
+  sorted.forEach((position, index) => {
+
+    const driver =
+      drivers.find(d =>
+        d.driver_number ===
+        position.driver_number
+      );
+
+    if (!driver) return;
+
+    const progress =
+      index / sorted.length;
+
+    const x =
+      180 + progress * 600;
+
+    const y =
+      300 +
+      Math.sin(progress * Math.PI * 2) * 140;
+
+    const circle =
+      document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      );
+
+    circle.setAttribute('cx', x);
+
+    circle.setAttribute('cy', y);
+
+    circle.setAttribute('r', 8);
+
+    circle.setAttribute(
+      'fill',
+      TEAM_COLORS[
+        driver.team_name
+      ] || '#00D2BE'
     );
 
-  weatherWidget.innerHTML =
-    weather.length
-      ? JSON.stringify(
-          weather[weather.length - 1],
-          null,
-          2
+    circle.setAttribute(
+      'class',
+      'driver-dot'
+    );
+
+    trackMap.appendChild(circle);
+  });
+}
+
+async function loadWeather() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${OPENF1}/weather?session_key=${currentSession.session_key}`
+      );
+
+    const weather =
+      await response.json();
+
+    if (!weather.length) {
+
+      weatherWidget.innerHTML =
+        'No Weather Data';
+
+      return;
+    }
+
+    const latest =
+      weather[weather.length - 1];
+
+    weatherWidget.innerHTML = `
+
+      Air Temp:
+      ${latest.air_temperature}°C
+
+      <br><br>
+
+      Track Temp:
+      ${latest.track_temperature}°C
+
+      <br><br>
+
+      Humidity:
+      ${latest.humidity}%
+    `;
+
+  } catch (error) {
+
+    weatherWidget.innerHTML =
+      'Weather Failed';
+  }
+}
+
+async function loadRaceControl() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${OPENF1}/race_control?session_key=${currentSession.session_key}`
+      );
+
+    const data =
+      await response.json();
+
+    if (!data.length) {
+
+      raceControlWidget.innerHTML =
+        'No Race Control Data';
+
+      return;
+    }
+
+    raceControlWidget.innerHTML =
+      data
+        .slice(-5)
+        .map(item =>
+          item.message
         )
-      : 'No Weather Data';
+        .join('<br><br>');
 
-  const raceControl =
-    await getRaceControl(
-      currentSession.session_key
-    );
+  } catch (error) {
 
-  raceControlWidget.innerHTML =
-    raceControl.length
-      ? raceControl
-          .slice(-5)
-          .map(item => item.message)
-          .join('<br><br>')
-      : 'No Race Control Data';
-
-  const radio =
-    await getRadio(
-      currentSession.session_key
-    );
-
-  radioWidget.innerHTML =
-    radio.length
-      ? radio
-          .slice(-5)
-          .map(item =>
-            'Driver #' +
-            item.driver_number
-          )
-          .join('<br><br>')
-      : 'No Radio Data';
-
-  const laps =
-    await getLaps(
-      currentSession.session_key
-    );
-
-  fastestLapWidget.innerHTML =
-    laps.length
-      ? 'Lap Data Loaded'
-      : 'No Lap Data';
+    raceControlWidget.innerHTML =
+      'Race Control Failed';
+  }
 }
 
-seasonSelector.onchange =
-  async () => {
+async function loadRadio() {
 
-    await populateEvents(
-      seasonSelector.value
-    );
-  };
+  try {
 
-loadSessionBtn.onclick =
-  async () => {
-
-    const selected =
-      eventSelector.value;
-
-    const sessions =
-      await getSessionsByYear(
-        seasonSelector.value
+    const response =
+      await fetch(
+        `${OPENF1}/team_radio?session_key=${currentSession.session_key}`
       );
 
-    const session =
-      sessions.find(
-        s =>
-          String(s.session_key) ===
-          String(selected)
+    const data =
+      await response.json();
+
+    if (!data.length) {
+
+      radioWidget.innerHTML =
+        'No Team Radio';
+
+      return;
+    }
+
+    radioWidget.innerHTML =
+      data
+        .slice(-5)
+        .map(item =>
+
+          'Driver #' +
+          item.driver_number
+
+        )
+        .join('<br><br>');
+
+  } catch (error) {
+
+    radioWidget.innerHTML =
+      'Radio Failed';
+  }
+}
+
+async function loadFastestLap() {
+
+  try {
+
+    const response =
+      await fetch(
+        `${OPENF1}/laps?session_key=${currentSession.session_key}`
       );
 
-    if (!session) return;
+    const laps =
+      await response.json();
 
-    await loadFullDashboard(
-      session
-    );
-  };
+    if (!laps.length) {
+
+      fastestLapWidget.innerHTML =
+        'No Lap Data';
+
+      return;
+    }
+
+    fastestLapWidget.innerHTML =
+      'Lap Data Loaded';
+
+  } catch (error) {
+
+    fastestLapWidget.innerHTML =
+      'Fastest Lap Failed';
+  }
+}
 
 initialize();
