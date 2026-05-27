@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Professional F1 Dashboard</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/timing.css">
+  <link rel="stylesheet" href="styles/map.css">
+  <link rel="stylesheet" href="styles/widgets.css">
+
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+
+  <header class="top-bar">
+
+    <div class="branding">
+
+      <h1>Mercedes AMG Formula 1 Dashboard</h1>
+
+      <div id="sessionName">
+        Loading Session...
+      </div>
+
+    </div>
+
+    <div class="top-controls">
+
+      <select id="seasonSelector">
+        <option value="2025">2025</option>
+        <option value="2026">2026</option>
+      </select>
+
+      <select id="eventSelector">
+        <option>Loading Events...</option>
+      </select>
+
+      <select id="sessionSelector">
+        <option value="Practice">Practice</option>
+        <option value="Qualifying">Qualifying</option>
+        <option value="Race">Race</option>
+      </select>
+
+      <button id="loadSessionBtn">
+        Load Session
+      </button>
+
+    </div>
+
+  </header>
+
+  <!-- MAIN GRID -->
+
+  <main class="dashboard-grid">
+
+    <!-- LEFT TIMING TOWER -->
+
+    <section class="timing-panel">
+
+      <div class="panel-title">
+        Timing Tower
+      </div>
+
+      <div id="timingTower">
+
+        Loading Timing Data...
+
+      </div>
+
+    </section>
+
+    <!-- CENTER -->
+
+    <section class="center-panel">
+
+      <!-- TRACK MAP -->
+
+      <div class="track-container">
+
+        <div class="panel-title">
+          Live Track Map
+        </div>
+
+        <div id="trackWrapper">
+
+          <svg id="trackMap" viewBox="0 0 1000 600">
+
+            <path
+              id="trackLayout"
+              d=""
+            ></path>
+
+          </svg>
+
+        </div>
+
+      </div>
+
+      <!-- DRIVER FOCUS -->
+
+      <div class="driver-focus-container">
+
+        <div class="panel-title">
+          Driver Focus
+        </div>
+
+        <div id="driverFocusPanel">
+
+          Select Driver
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RIGHT SIDE -->
+
+    <section class="right-panel">
+
+      <div class="widget">
+
+        <div class="panel-title">
+          Weather
+        </div>
+
+        <div id="weatherWidget">
+
+          Loading Weather...
+
+        </div>
+
+      </div>
+
+      <div class="widget">
+
+        <div class="panel-title">
+          Race Control
+        </div>
+
+        <div id="raceControlWidget">
+
+          Loading Race Control...
+
+        </div>
+
+      </div>
+
+      <div class="widget">
+
+        <div class="panel-title">
+          Team Radio
+        </div>
+
+        <div id="radioWidget">
+
+          Loading Radio...
+
+        </div>
+
+      </div>
+
+      <div class="widget">
+
+        <div class="panel-title">
+          Fastest Lap
+        </div>
+
+        <div id="fastestLapWidget">
+
+          Loading Fastest Lap...
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script type="module" src="app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,11 @@
+.widget-highlight {
+  border: 1px solid #00d2be;
+}
+
+.widget-warning {
+  border: 1px solid orange;
+}
+
+.widget-danger {
+  border: 1px solid red;
+}
