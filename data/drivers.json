@@ -1,0 +1,121 @@
+{
+  "1": {
+    "name": "Max Verstappen",
+    "team": "Red Bull"
+  },
+
+  "11": {
+    "name": "Sergio Perez",
+    "team": "Red Bull"
+  },
+
+  "16": {
+    "name": "Charles Leclerc",
+    "team": "Ferrari"
+  },
+
+  "55": {
+    "name": "Carlos Sainz",
+    "team": "Ferrari"
+  },
+
+  "44": {
+    "name": "Lewis Hamilton",
+    "team": "Mercedes"
+  },
+
+  "63": {
+    "name": "George Russell",
+    "team": "Mercedes"
+  },
+
+  "4": {
+    "name": "Lando Norris",
+    "team": "McLaren"
+  },
+
+  "81": {
+    "name": "Oscar Piastri",
+    "team": "McLaren"
+  },
+
+  "14": {
+    "name": "Fernando Alonso",
+    "team": "Aston Martin"
+  },
+
+  "18": {
+    "name": "Lance Stroll",
+    "team": "Aston Martin"
+  },
+
+  "10": {
+    "name": "Pierre Gasly",
+    "team": "Alpine"
+  },
+
+  "31": {
+    "name": "Esteban Ocon",
+    "team": "Alpine"
+  },
+
+  "23": {
+    "name": "Alexander Albon",
+    "team": "Williams"
+  },
+
+  "2": {
+    "name": "Logan Sargeant",
+    "team": "Williams"
+  },
+
+  "22": {
+    "name": "Yuki Tsunoda",
+    "team": "RB"
+  },
+
+  "3": {
+    "name": "Daniel Ricciardo",
+    "team": "RB"
+  },
+
+  "77": {
+    "name": "Valtteri Bottas",
+    "team": "Kick Sauber"
+  },
+
+  "24": {
+    "name": "Zhou Guanyu",
+    "team": "Kick Sauber"
+  },
+
+  "20": {
+    "name": "Kevin Magnussen",
+    "team": "Haas"
+  },
+
+  "27": {
+    "name": "Nico Hulkenberg",
+    "team": "Haas"
+  },
+
+  "12": {
+    "name": "Kimi Antonelli",
+    "team": "Mercedes"
+  },
+
+  "43": {
+    "name": "Franco Colapinto",
+    "team": "Williams"
+  },
+
+  "30": {
+    "name": "Liam Lawson",
+    "team": "RB"
+  },
+
+  "87": {
+    "name": "Oliver Bearman",
+    "team": "Ferrari"
+  }
+}
